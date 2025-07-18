@@ -30,12 +30,45 @@ async function run() {
         const database = client.db("coffeeDB");
         const coffeeCollection = database.collection("Coffee");
 
+        const userCollection = client.db("coffeeDB").collection("users");
+
         app.post('/coffee', async (req, res) => {
             const coffee = req.body;
             console.log(coffee);
             const result = await coffeeCollection.insertOne(coffee);
             res.send(result);
         })
+        
+        //firebase user data & login user to mongoDB
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            console.log(user)
+            const result = await userCollection.insertOne(user);
+            res.send(result)
+
+        })
+        app.get('/users', async (req, res) => {
+            const result = await userCollection.find().toArray();
+            res.send(result)
+
+        })
+        app.patch('/users', async (req, res) => {
+            const email = req.body.email
+            console.log(email)
+            const query = { email }
+            const updateDoc = {
+                $set: {
+                    lastSignInTime: req.body.LoginTime
+                },
+            };
+            const result = await userCollection.updateOne(query, updateDoc);
+            res.send(result)
+
+
+        })
+        // ------------------
+
+
         app.get('/coffee', async (req, res) => {
             const result = await coffeeCollection.find().toArray();
             res.send(result);
@@ -56,14 +89,14 @@ async function run() {
             const result = await coffeeCollection.deleteOne(query);
             res.send(result)
         });
-        app.put('/coffee/:id', async(req, res) => {
-            const id=req.params.id;
-            const coffee= req.body;
-            console.log(id,coffee)
-            const query= {_id: new ObjectId(id)}
+        app.put('/coffee/:id', async (req, res) => {
+            const id = req.params.id;
+            const coffee = req.body;
+            console.log(id, coffee)
+            const query = { _id: new ObjectId(id) }
             const options = { upsert: true };
-            const updateDoc ={
-                $set:{
+            const updateDoc = {
+                $set: {
                     coffeeName: coffee.coffeeName,
                     supplierName: coffee.supplierName,
                     category: coffee.category,
@@ -76,7 +109,7 @@ async function run() {
             }
             const result = await coffeeCollection.updateOne(query, updateDoc, options);
             res.send(result);
-            
+
         })
 
 
