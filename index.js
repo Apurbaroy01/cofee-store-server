@@ -31,6 +31,7 @@ async function run() {
         const coffeeCollection = database.collection("Coffee");
 
         const userCollection = client.db("coffeeDB").collection("users");
+        const odderCollection = client.db("coffeeDB").collection("oders");
 
         app.post('/coffee', async (req, res) => {
             const coffee = req.body;
@@ -38,7 +39,7 @@ async function run() {
             const result = await coffeeCollection.insertOne(coffee);
             res.send(result);
         })
-        
+
         //firebase user data & login user to mongoDB
         app.post('/users', async (req, res) => {
             const user = req.body;
@@ -110,7 +111,20 @@ async function run() {
             const result = await coffeeCollection.updateOne(query, updateDoc, options);
             res.send(result);
 
+        });
+
+        // odder collection
+        app.post('/oders', async (req, res) => {
+            const oders = req.body;
+            console.log(oders);
+            const result = await odderCollection.insertOne(oders);
+            res.send(result);
         })
+        app.get('/oders', async (req, res) => {
+           const result = await odderCollection.find().toArray();
+            res.send(result); 
+        })
+
 
 
 
